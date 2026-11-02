@@ -2,6 +2,28 @@
 
 This file records the changes we make to CyberDome, newest first. For each fix we write what we saw, what was wrong and how we fixed it. Runtime-generated data is listed separately from intentional source and configuration changes.
 
+## 2026-10-20
+
+### Changed: the trust factors have three named groups
+
+Documentation only. The code and the weights are unchanged.
+
+**What we saw:** Our two documents grouped the trust factors in different ways. `docs/trust-model.md` called login history, device and access frequency the "behaviour" factors (55% of the score), and gave no name to the other four. `docs/policies.md`, in the table "How each policy uses identity and context", used two groups instead: identity (login history, MFA, account age) and context (device, location, time, access frequency). So login history was "behaviour" in one document and "identity" in the other, and device and access frequency were "behaviour" in one and "context" in the other.
+
+**Why it matters:** we explain the weights by group ("behaviour first"), in the documents, the report and the presentation. If the groups change from one document to the next, the explanation is hard to follow, and a reader can't tell which split is right.
+
+**What we changed:**
+
+- `docs/trust-model.md` has a new section, "Three groups of factors": behaviour (login history, device, access frequency, 0.55), context (location, time of access, 0.25) and identity (identity strength, account age, 0.20). It explains each group with an example (Bob, and an attacker with Bob's password), why we use three groups, and why login history is behaviour and not identity.
+- `docs/policies.md`: the P4 and P5 rows use the same three groups. The identity column now lists only the identity factors, and the request context column lists the behaviour and context factors. A short note under the table explains why behaviour sits on the context side.
+
+**Example of the old and new P4 row:**
+
+| | Identity or role | Request context |
+| --- | --- | --- |
+| Before | The admin role and the identity factors (login history, MFA, account age) | The context factors (device, location, time, access frequency) |
+| After | The admin role and the identity factors (identity strength, account age) | The behaviour factors (login history, device, access frequency) and context factors (location, time of access) |
+
 ## 2026-10-14
 
 ### Added: diagrams, and a README that describes CyberDome as it is now

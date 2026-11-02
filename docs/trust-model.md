@@ -34,6 +34,26 @@ The night window can cross midnight, for example 22:00 to 06:00.
 
 `LOCAL` (localhost and private networks) counts as low risk, because in our lab that is where the users are.
 
+## Three groups of factors
+
+We sort the 7 factors into three groups. Each group answers a different question about the request:
+
+| Group | Factors | Weight together | The question it answers |
+| --- | --- | --- | --- |
+| **Behaviour** | Login history, device, access frequency | 0.55 | How is this user acting right now? |
+| **Context** | Location, time of access | 0.25 | Where and when does the request come from? |
+| **Identity** | Identity strength, account age | 0.20 | How strong and how established is this account? |
+
+**Example.** Bob logs in with his password, from his usual laptop, in the daytime, from the lab network. Behaviour: his recent logins worked, the device is known, and he made a normal number of requests. Context: the location is `LOCAL` and it's not night. Identity: his email is verified but he has no MFA, and his account is new. Now an attacker logs in with Bob's stolen password. Identity looks exactly the same, because it describes the account and not the person using it. Context can often be faked, for example with a VPN. But the attacker is on a new device, and a script makes many requests quickly, so the behaviour factors drop.
+
+**Why three groups:**
+
+- The names make the weights easy to explain. Behaviour gets the most weight (see "Behaviour first" below), because it is the hardest part for an attacker to fake.
+- The groups follow common Zero Trust terms. NIST SP 800-207 describes the inputs to a trust decision as the subject's identity and attributes, the device's state, and environmental factors such as location and time. The ARB-ZTA paper adds behaviour, such as access frequency and authentication failures.
+- One name for each factor's group, used in every document. Before this, `docs/policies.md` counted login history as an identity factor and device and access frequency as context factors, while this document counted all three as behaviour. See "Changed: the trust factors have three named groups" in `changelog.md`.
+
+**Login history is behaviour, not identity.** It is about the account, but it measures what has happened recently (logins that worked and logins that failed), not a fixed property of the account. A burst of failed logins can change it within minutes, like the other behaviour factors.
+
 ## Why these factors and weights
 
 We based the weights on the ARB-ZTA paper (Nahar and Andersson), which scores risk from access frequency (0.25), session duration (0.20), authentication failures (0.25), time of day (0.15) and reaction to MFA challenges (0.15). Our reasons per factor:

@@ -44,9 +44,11 @@ The task says "Policies must consider both identity/role and request context". W
 | P1 | The user and their login history | The authentication status of this request |
 | P2 | The user's roles | The resource, and the action (`read` or `write`) |
 | P3 | Whether the user has a privileged role, and their recent logins | Location, time of day, and whether the resource is an admin resource |
-| P4 | The admin role (P2 has checked it) and the identity factors of the trust score (login history, MFA, account age) | The context factors of the trust score (device, location, time, access frequency) |
-| P5 | The identity factors of the trust score | The context factors of the trust score, and the resource's minimum |
+| P4 | The admin role (P2 has checked it) and the identity factors of the trust score (identity strength, account age) | The behaviour factors (login history, device, access frequency) and context factors (location, time of access) of the trust score |
+| P5 | The identity factors of the trust score | The behaviour and context factors of the trust score, and the resource's minimum |
 | P6 | All of the above | All of the above |
+
+The factor groups (behaviour, context, identity) are explained in "Three groups of factors" in `trust-model.md`. The behaviour factors sit in the request context column, because they describe what is happening around this request right now: which device sends it, how many requests came just before it, and whether the recent logins worked. The identity factors describe the account itself.
 
 In the first version of the policies, P2 only looked at the resource, and P3 never looked at the role. "Why P2 checks the action" and "Why P3 depends on the role" below explain how we changed that.
 
